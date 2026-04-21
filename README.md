@@ -40,3 +40,57 @@ src/
 |- App.jsx               # Configuración de React Router y layout principal
 |- index.css             # Directivas de Tailwind y estilos globales
 |- main.jsx              # Punto de entrada de la aplicación React
+```
+
+## 3) Instalación y puesta en marcha
+
+### Requisitos previos
+* Node.js (v18.x o superior recomendado)
+* npm (v9.x o superior)
+
+### Entorno de Desarrollo Local
+Clonar el repositorio e instalar dependencias:
+
+```bash
+npm install
+```
+
+Ejecutar el servidor de desarrollo (Vite):
+
+```bash
+npm run dev
+```
+
+El aplicativo estará disponible en: `http://localhost:5173`
+
+Construir para producción:
+
+```bash
+npm run build
+```
+*(Generará la carpeta `dist/` con los archivos estáticos optimizados).*
+
+## 4) Sistema de Diseño y UI/UX
+El Front-End implementa una interfaz Cyber-Minimalista, diseñada específicamente para reducir la fatiga visual del personal durante jornadas largas y entornos de alta presión (como la cocina).
+
+**Paleta de Colores Institucional (`tailwind.config.js`):**
+* `chifa-black` (`#121212` / `#1a1a1a`): Fondos base y tarjetas para alto contraste.
+* `chifa-gold` (`#d4af37`): Acciones principales, branding y métricas positivas.
+* `chifa-red` (`#b30000` / `#8b0000`): Alertas críticas, pedidos demorados y acentos institucionales.
+
+## 5) Integración con Backend (Próximamente)
+Actualmente, las interfaces del Sprint 1 funcionan mediante *mocking* de datos para validación de UI/UX y flujos de enrutamiento.
+
+En los próximos sprints, se configurarán las variables de entorno en el archivo `.env` para consumir la API REST en Spring Boot:
+
+```env
+VITE_API_URL=http://localhost:8080/api/v1
+```
+*(Nota: Las variables de entorno en Vite deben tener el prefijo `VITE_` para ser accesibles en el código cliente mediante `import.meta.env`).*
+
+## 6) Estándares de Desarrollo
+El equipo sigue el estándar **Conventional Commits** para el control de versiones:
+* `feat:` Nuevas características o módulos (ej. `feat: agregar vista de KDS`).
+* `fix:` Corrección de errores.
+* `style:` Cambios visuales o de formato (CSS/Tailwind).
+* `refactor:` Reestructuración de código sin alterar funcionalidad.
