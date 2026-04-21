@@ -1,16 +1,97 @@
-# React + Vite
+# Dragon Dorado - Frontend Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web Single-Page Application (SPA) para la gestión operativa del restaurante Dragon Dorado. Este sistema proporciona interfaces optimizadas para distintos roles (Administrador, Mozo, Cocinero), garantizando agilidad en la toma de pedidos y visualización en tiempo real.
 
-Currently, two official plugins are available:
+## 1) Descripción general
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Propósito
+Este proyecto expone la capa de presentación (Front-End) del sistema, diseñada con un enfoque "Mobile-First" y una arquitectura basada en componentes. Cubre los flujos críticos del restaurante:
+* **Módulo de Seguridad:** Autenticación de personal.
+* **Módulo de Administración:** Panel de control (Dashboard) con KPIs.
+* **Módulo de Salón:** Mapa de mesas interactivo y gestión de estados.
+* **Módulo de Ventas:** Comanda digital táctil para la toma rápida de pedidos con notas a cocina.
+* **Módulo de Cocina:** Monitor KDS (Kitchen Display System) de alto contraste para gestión de tickets.
 
-## React Compiler
+### Stack tecnológico
+* **Framework:** React 18
+* **Herramienta de Construcción:** Vite
+* **Estilos y UI:** Tailwind CSS (configurado con paleta institucional corporativa)
+* **Enrutamiento:** React Router Dom v6
+* **Iconografía:** Lucide React
+* **Despliegue:** Vercel (Proyectado) / Entorno Node.js
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 2) Estructura del proyecto
 
-## Expanding the ESLint configuration
+El proyecto sigue una arquitectura modular agrupada por funcionalidad (Feature-Sliced Design simplificado):
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+src/
+|- assets/               # Imágenes, logos y recursos estáticos
+|- components/           # Componentes UI reutilizables (Botones, Tarjetas, Modales)
+|- pages/                # Vistas principales de la aplicación
+|  |- admin/             # Dashboard y reportes
+|  |  |- Dashboard.jsx
+|  |- auth/              # Seguridad y acceso
+|  |  |- Login.jsx
+|  |- kitchen/           # Interfaces de cocina
+|  |  |- KdsMonitor.jsx
+|  |- salon/             # Gestión de mesas y comandas
+|  |  |- TableMap.jsx
+|  |  |- TakeOrder.jsx
+|- App.jsx               # Configuración de React Router y layout principal
+|- index.css             # Directivas de Tailwind y estilos globales
+|- main.jsx              # Punto de entrada de la aplicación React
+
+3) Instalación y puesta en marcha
+Requisitos previos
+Node.js (v18.x o superior recomendado)
+
+npm (v9.x o superior)
+
+Entorno de Desarrollo Local
+Clonar el repositorio e instalar dependencias:
+
+Bash
+npm install
+Ejecutar el servidor de desarrollo (Vite):
+
+Bash
+npm run dev
+El aplicativo estará disponible en: http://localhost:5173
+
+Construir para producción:
+
+Bash
+npm run build
+(Generará la carpeta dist/ con los archivos estáticos optimizados).
+
+4) Sistema de Diseño y UI/UX
+El Front-End implementa una interfaz Cyber-Minimalista, diseñada específicamente para reducir la fatiga visual del personal durante jornadas largas y entornos de alta presión (como la cocina).
+
+Paleta de Colores Institucional (tailwind.config.js):
+
+chifa-black (#121212 / #1a1a1a): Fondos base y tarjetas para alto contraste.
+
+chifa-gold (#d4af37): Acciones principales, branding y métricas positivas.
+
+chifa-red (#b30000 / #8b0000): Alertas críticas, pedidos demorados y acentos institucionales.
+
+5) Integración con Backend (Próximamente)
+Actualmente, las interfaces del Sprint 1 funcionan mediante mocking de datos para validación de UI/UX y flujos de enrutamiento.
+
+En los próximos sprints, se configurarán las variables de entorno en el archivo .env para consumir la API REST en Spring Boot:
+
+Code snippet
+VITE_API_URL=http://localhost:8080/api/v1
+(Nota: Las variables de entorno en Vite deben tener el prefijo VITE_ para ser accesibles en el código cliente mediante import.meta.env).
+
+6) Estándares de Desarrollo
+El equipo sigue el estándar Conventional Commits para el control de versiones:
+
+feat: Nuevas características o módulos (ej. feat: agregar vista de KDS).
+
+fix: Corrección de errores.
+
+style: Cambios visuales o de formato (CSS/Tailwind).
+
+refactor: Reestructuración de código sin alterar funcionalidad.
