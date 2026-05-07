@@ -1,12 +1,9 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
-import Login from './pages/auth/Login';
-import TableMap from './pages/salon/TableMap';
-import TakeOrder from './pages/salon/TakeOrder';
-import KdsMonitor from './pages/kitchen/KdsMonitor'; 
-import Dashboard from './pages/admin/Dashboard';
-
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Login from "./pages/auth/Login";
+import TableMap from "./pages/salon/TableMap";
+import TakeOrder from "./pages/salon/TakeOrder";
+import KdsMonitor from "./pages/kitchen/KdsMonitor";
+import Dashboard from "./pages/admin/Dashboard";
 
 function App() {
   return (
