@@ -1,13 +1,43 @@
-import React from 'react';
+//src/pages/auth/Login.jsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
+import axios from 'axios';
 
 export default function Login() {
   const navigate = useNavigate();
+  
+  // 1. Estados para capturar los inputs y posibles errores
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleMockLogin = (e) => {
+  const handleRealLogin = async (e) => {
     e.preventDefault(); 
-    console.log("Simulando inicio de sesión... ¡Entrando al sistema!");
-    navigate('/dashboard');
+    setError(''); // Limpiamos errores previos
+    setIsLoading(true);
+
+    try {
+      // 2. Apuntamos al backend usando la variable de Vite
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        username: username,
+        password: password
+      });
+
+      // 3. ¡Éxito! Guardamos el token y vamos al dashboard
+      const token = response.data.accessToken;
+      localStorage.setItem('accessToken', token);
+      
+      console.log("¡Llave JWT obtenida!");
+      navigate('/dashboard');
+
+    } catch (err) {
+      console.error("Error en login:", err);
+      // Mostramos un mensaje de error si las credenciales fallan o el server está caído
+      setError('Credenciales incorrectas o servidor no disponible.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,7 +66,14 @@ export default function Login() {
             Iniciar Sesión
           </h2>
 
-          <form className="space-y-6" onSubmit={handleMockLogin}>
+          {/* Bloque para mostrar mensajes de error estéticos */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 text-sm rounded-md text-center">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleRealLogin}>
             
             {/* Input Usuario */}
             <div className="space-y-2">
@@ -44,6 +81,9 @@ export default function Login() {
               <input 
                 type="text" 
                 placeholder="Ej: admin_chifa" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
                 className="w-full bg-[#1e1e1e] border border-gray-600 text-white rounded-md px-4 py-3 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors placeholder-gray-500"
               />
             </div>
@@ -54,6 +94,9 @@ export default function Login() {
               <input 
                 type="password" 
                 placeholder="••••••••" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 className="w-full bg-[#1e1e1e] border border-gray-600 text-white rounded-md px-4 py-3 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors placeholder-gray-500"
               />
             </div>
@@ -61,9 +104,14 @@ export default function Login() {
             {/* Botón Ingresar */}
             <button 
               type="submit" 
-              className="w-full bg-[#d4af37] hover:bg-[#f1c40f] text-[#1a1a1a] font-bold py-3 px-4 rounded-md transition-all duration-200 mt-4 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              disabled={isLoading}
+              className={`w-full font-bold py-3 px-4 rounded-md transition-all duration-200 mt-4 shadow-lg ${
+                isLoading 
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                  : 'bg-[#d4af37] hover:bg-[#f1c40f] text-[#1a1a1a] hover:shadow-xl hover:-translate-y-0.5'
+              }`}
             >
-              INGRESAR AL SISTEMA
+              {isLoading ? 'CONECTANDO...' : 'INGRESAR AL SISTEMA'}
             </button>
 
           </form>
