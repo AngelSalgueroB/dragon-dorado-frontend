@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   LayoutGrid,
   ChefHat,
@@ -9,9 +10,40 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../api/axios'; // Importamos tu peaje con JWT
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  
+  // 1. Estados para la API
+  const [metrics, setMetrics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // 2. Llamada al backend al cargar la página
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const response = await api.get('/dashboard/summary');
+        setMetrics(response.data);
+      } catch (error) {
+        console.error("Error obteniendo métricas:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMetrics();
+  }, []);
+
+  // 3. Cálculos dinámicos
+  const totalVentas = metrics 
+    ? ((metrics.dineInTotal || 0) + (metrics.takeawayTotal || 0) + (metrics.deliveryTotal || 0))
+    : 0;
+  
+  // Separamos enteros y decimales para mantener tu diseño exacto
+  const [enteros, decimales] = totalVentas.toFixed(2).split('.');
+  
+  const mesasActivas = metrics?.dineInCount || 0;
+  const pedidosCriticos = 0; // Lo dejamos en 0 hasta que el backend tenga estado "crítico"
 
   const modules = [
     {
@@ -39,28 +71,33 @@ export default function Dashboard() {
       name: 'Finanzas y Reportes',
       icon: <CircleDollarSign size={32} />,
       path: '#',
-      color: 'text-chifa-gold',
+      color: 'text-yellow-600', // Ajusté un poco para que no falle si no tienes chifa-gold en tailwind.config
       desc: 'Cierre de caja y rentabilidad.',
     },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken'); // Borramos la llave al salir
+    navigate('/');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6 text-gray-800 font-sans selection:bg-chifa-red selection:text-white">
+    <div className="min-h-screen bg-gray-50 p-6 text-gray-800 font-sans">
       {/* Header */}
       <header className="flex justify-between items-center mb-10 border-b border-gray-200 pb-5 relative">
-        <div className="absolute bottom-[-1px] left-0 w-32 h-[3px] bg-chifa-red"></div>
+        <div className="absolute bottom-[-1px] left-0 w-32 h-[3px] bg-red-800"></div>
         <div>
           <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter flex items-center gap-3">
-            Panel de <span className="text-chifa-red">Control</span>
+            Panel de <span className="text-red-800">Control</span>
           </h1>
           <p className="text-gray-500 text-xs uppercase tracking-widest mt-1">
             Sesión iniciada:{' '}
-            <span className="text-chifa-red font-bold">Admin_Chifa</span>
+            <span className="text-red-800 font-bold">Admin_Chifa</span>
           </p>
         </div>
         <button
-          onClick={() => navigate('/')}
-          className="bg-white border border-gray-300 text-gray-700 hover:bg-chifa-red hover:text-white hover:border-chifa-red px-5 py-2 rounded-lg font-bold text-xs transition-all uppercase shadow-sm"
+          onClick={handleLogout}
+          className="bg-white border border-gray-300 text-gray-700 hover:bg-red-800 hover:text-white hover:border-red-800 px-5 py-2 rounded-lg font-bold text-xs transition-all uppercase shadow-sm"
         >
           Cerrar Sesión
         </button>
@@ -68,7 +105,9 @@ export default function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-white p-6 rounded-xl shadow-sm border-4 border-chifa-gold">
+        
+        {/* Tarjeta de Ventas */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border-4 border-yellow-500">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
               Ventas del Día
@@ -78,9 +117,12 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="text-4xl font-black text-gray-900 tracking-tight">
-            S/ 1,450<span className="text-xl text-gray-400">.50</span>
+            {loading ? '...' : `S/ ${enteros}`}
+            <span className="text-xl text-gray-400">.{loading ? '00' : decimales}</span>
           </p>
         </div>
+
+        {/* Tarjeta de Mesas */}
         <div className="bg-white p-6 rounded-xl shadow-sm border-4 border-emerald-500">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -91,51 +133,49 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="text-4xl font-black text-gray-900 tracking-tight">
-            05 <span className="text-xl text-gray-400">/ 08</span>
+            {loading ? '...' : mesasActivas < 10 ? `0${mesasActivas}` : mesasActivas} <span className="text-xl text-gray-400">/ 08</span>
           </p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border-4 border-chifa-red">
+
+        {/* Tarjeta Críticos */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border-4 border-red-600">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
               Pedidos Críticos
             </span>
             <div className="p-2 bg-red-50 rounded-lg">
-              <AlertCircle size={20} className="text-chifa-red animate-pulse" />
+              <AlertCircle size={20} className="text-red-600 animate-pulse" />
             </div>
           </div>
-          <p className="text-4xl font-black text-gray-900 tracking-tight">03</p>
+          <p className="text-4xl font-black text-gray-900 tracking-tight">
+            {loading ? '...' : `0${pedidosCriticos}`}
+          </p>
         </div>
       </div>
 
       {/* Módulos */}
-      <h2 className="text-xs font-bold text-chifa-red uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-        <span className="w-2 h-2 bg-chifa-red rounded-full"></span> Navegación
-        por Módulos
+      <h2 className="text-xs font-bold text-red-800 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+        <span className="w-2 h-2 bg-red-800 rounded-full"></span> Navegación por Módulos
       </h2>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {modules.map((mod, idx) => (
           <div
             key={idx}
             onClick={() => mod.path !== '#' && navigate(mod.path)}
-            className="group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:border-chifa-red hover:shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-1"
+            className="group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:border-red-800 hover:shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-1"
           >
-            <div
-              className={`mb-5 transition-transform duration-300 group-hover:scale-110 ${mod.color}`}
-            >
+            <div className={`mb-5 transition-transform duration-300 group-hover:scale-110 ${mod.color}`}>
               {mod.icon}
             </div>
-            <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-chifa-red transition-colors">
+            <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-red-800 transition-colors">
               {mod.name}
             </h3>
             <p className="text-gray-500 text-sm leading-relaxed mb-6">
               {mod.desc}
             </p>
-            <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-400 group-hover:text-chifa-red transition-colors">
-              Ingresar{' '}
-              <ArrowRight
-                size={16}
-                className="transition-transform group-hover:translate-x-2"
-              />
+            <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-400 group-hover:text-red-800 transition-colors">
+              Ingresar <ArrowRight size={16} className="transition-transform group-hover:translate-x-2" />
             </div>
           </div>
         ))}

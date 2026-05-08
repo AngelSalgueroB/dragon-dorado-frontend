@@ -1,3 +1,15 @@
+PRIMERO:
 git add .
-git commit -m "feat: integración de login real con API usando Axios"
+git commit -m ""
 git push origin main
+
+
+Traer:
+git pull origin main
+npm install
+
+
+backend:
+export DB_PASSWORD="root123"
+export DB_PORT="5432" o "5433"
+./mvnw spring-boot:run

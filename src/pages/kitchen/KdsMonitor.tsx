@@ -1,3 +1,4 @@
+//path src/pages/kitchen/KdsMonitor.tsx
 import { AlertTriangle, CheckCircle, ChefHat, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

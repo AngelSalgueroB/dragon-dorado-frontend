@@ -1,3 +1,4 @@
+//path src/pages/salon/TableMap.tsx
 import { Home, Info, UserX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { tablesData } from './tables.data.js';
