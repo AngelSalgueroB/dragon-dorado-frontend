@@ -5,6 +5,7 @@ import Dashboard from './pages/admin/Dashboard';
 // 1. Importamos tus otras vistas
 import TableMap from './pages/salon/TableMap';
 import KdsMonitor from './pages/kitchen/KdsMonitor';
+import DashboardLayout from './layout/DashboardLayout';
 
 export default function App() {
   return (
@@ -12,10 +13,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        // 2. Agregamos las rutas para que React las encuentre
-        <Route path="/salon" element={<TableMap />} />
-        <Route path="/cocina" element={<KdsMonitor />} />
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/salon" element={<TableMap />} />
+          <Route path="/cocina" element={<KdsMonitor />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
