@@ -40,7 +40,6 @@ export default function EditDriverModal({
     active: driver.active,
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setForm({
@@ -64,15 +63,10 @@ export default function EditDriverModal({
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       await updateDeliveryDriver(driver.id, form);
       onSuccess();
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ?? 'Error al actualizar el conductor',
-      );
     } finally {
       setLoading(false);
     }
@@ -163,13 +157,6 @@ export default function EditDriverModal({
               <div className="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-800" />
             </label>
           </div>
-
-          {/* Error */}
-          {error && (
-            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">

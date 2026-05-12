@@ -1,9 +1,8 @@
 import apiClient from '../../config/api';
-import { PageableParams } from '../common';
-import { TableResponse } from './tables.interfaces';
+import { GetTablesParams, TableResponse } from './tables.interfaces';
 
 export async function getTables(
-  params: PageableParams,
+  params: GetTablesParams,
 ): Promise<TableResponse[]> {
   const { data } = await apiClient.get<TableResponse[]>('/tables', { params });
   return data;

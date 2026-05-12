@@ -44,7 +44,6 @@ export default function CreateDriverModal({
     documentNumber: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -54,13 +53,10 @@ export default function CreateDriverModal({
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       await createDeliveryDriver(form);
       onSuccess();
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Error al crear el conductor');
     } finally {
       setLoading(false);
     }
@@ -161,13 +157,6 @@ export default function CreateDriverModal({
               />
             </div>
           </div>
-
-          {/* Error */}
-          {error && (
-            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
