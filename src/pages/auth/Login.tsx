@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { SubmitEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../actions/auth/login';
 
@@ -9,7 +9,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRealLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRealLogin = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
