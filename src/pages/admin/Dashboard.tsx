@@ -1,30 +1,29 @@
-import React, { useState, useEffect } from 'react';
 import {
-  LayoutGrid,
-  ChefHat,
-  Truck,
-  CircleDollarSign,
-  TrendingUp,
-  Users,
   AlertCircle,
   ArrowRight,
+  ChefHat,
+  CircleDollarSign,
+  LayoutGrid,
+  TrendingUp,
+  Truck,
+  Users,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api/axios'; // Importamos tu peaje con JWT
+import { getDashboardSummary } from '../../actions/dashboard/get-dashboard-summary';
+import { DashboardSummaryResponse } from '../../actions/dashboard/dashboard.interfaces';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   
-  // 1. Estados para la API
-  const [metrics, setMetrics] = useState<any>(null);
+  const [metrics, setMetrics] = useState<DashboardSummaryResponse>();
   const [loading, setLoading] = useState(true);
 
-  // 2. Llamada al backend al cargar la página
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await api.get('/dashboard/summary');
-        setMetrics(response.data);
+        const response = await getDashboardSummary();
+        setMetrics(response);
       } catch (error) {
         console.error("Error obteniendo métricas:", error);
       } finally {

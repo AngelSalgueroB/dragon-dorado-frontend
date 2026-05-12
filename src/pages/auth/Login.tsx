@@ -1,40 +1,29 @@
-//src/pages/auth/Login.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../../actions/auth/login';
 
 export default function Login() {
   const navigate = useNavigate();
-  
-  // 1. Estados para capturar los inputs y posibles errores
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRealLogin = async (e) => {
-    e.preventDefault(); 
-    setError(''); // Limpiamos errores previos
+  const handleRealLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
 
     try {
-      // 2. Apuntamos al backend usando la variable de Vite
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        username: username,
-        password: password
-      });
+      const request = {
+        username,
+        password,
+      };
 
-      // 3. ¡Éxito! Guardamos el token y vamos al dashboard
-      const token = response.data.accessToken;
-      localStorage.setItem('accessToken', token);
-      
-      console.log("¡Llave JWT obtenida!");
+      const response = await login(request);
+
+      localStorage.setItem('accessToken', response.accessToken);
+
       navigate('/dashboard');
-
-    } catch (err) {
-      console.error("Error en login:", err);
-      // Mostramos un mensaje de error si las credenciales fallan o el server está caído
-      setError('Credenciales incorrectas o servidor no disponible.');
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +31,6 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen bg-[#1a1a1a] font-sans">
-      
       {/* Panel Izquierdo */}
       <div className="hidden md:flex flex-col justify-center items-center w-1/3 bg-[#8b0000] border-r-4 border-[#660000] shadow-2xl z-10">
         <h1 className="text-4xl font-black text-[#d4af37] mb-6 tracking-wider shadow-sm">
@@ -51,36 +39,24 @@ export default function Login() {
         <p className="text-white/90 text-sm mb-8 tracking-wide">
           Sistema de Gestión de Pedidos
         </p>
-        <p className="text-white/60 text-xs">
-          v1.0 - 2026
-        </p>
+        <p className="text-white/60 text-xs">v1.0 - 2026</p>
       </div>
 
       {/* Panel Derecho - Formulario de Login */}
       <div className="flex flex-col justify-center items-center w-full md:w-2/3 p-4">
-        
         {/* Tarjeta de Autenticación */}
         <div className="bg-[#2a2a2a] w-full max-w-md p-10 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.5)] border-t-2 border-[#d4af37]">
-          
           <h2 className="text-2xl font-bold text-[#d4af37] text-center mb-8">
             Iniciar Sesión
           </h2>
 
-          {/* Bloque para mostrar mensajes de error estéticos */}
-          {error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 text-sm rounded-md text-center">
-              {error}
-            </div>
-          )}
-
           <form className="space-y-6" onSubmit={handleRealLogin}>
-            
             {/* Input Usuario */}
             <div className="space-y-2">
               <label className="text-sm text-gray-300">Usuario / Correo</label>
-              <input 
-                type="text" 
-                placeholder="Ej: admin_chifa" 
+              <input
+                type="text"
+                placeholder="Ej: admin_chifa"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -91,9 +67,9 @@ export default function Login() {
             {/* Input Contraseña */}
             <div className="space-y-2">
               <label className="text-sm text-gray-300">Contraseña</label>
-              <input 
-                type="password" 
-                placeholder="••••••••" 
+              <input
+                type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -102,22 +78,20 @@ export default function Login() {
             </div>
 
             {/* Botón Ingresar */}
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isLoading}
               className={`w-full font-bold py-3 px-4 rounded-md transition-all duration-200 mt-4 shadow-lg ${
-                isLoading 
-                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                isLoading
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   : 'bg-[#d4af37] hover:bg-[#f1c40f] text-[#1a1a1a] hover:shadow-xl hover:-translate-y-0.5'
               }`}
             >
               {isLoading ? 'CONECTANDO...' : 'INGRESAR AL SISTEMA'}
             </button>
-
           </form>
         </div>
       </div>
-
     </div>
   );
 }

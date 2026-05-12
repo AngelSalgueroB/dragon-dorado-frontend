@@ -13,11 +13,10 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        
         // 2. Agregamos las rutas para que React las encuentre
         <Route path="/salon" element={<TableMap />} />
         <Route path="/cocina" element={<KdsMonitor />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
