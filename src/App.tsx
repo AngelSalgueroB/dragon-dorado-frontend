@@ -6,6 +6,7 @@ import Dashboard from './pages/admin/Dashboard';
 import TableMap from './pages/salon/TableMap';
 import KdsMonitor from './pages/kitchen/KdsMonitor';
 import DashboardLayout from './layout/DashboardLayout';
+import DriversPage from './pages/drivers/DriversPage';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path='/conductores' element={<DriversPage />} />
           <Route path="/salon" element={<TableMap />} />
           <Route path="/cocina" element={<KdsMonitor />} />
         </Route>
