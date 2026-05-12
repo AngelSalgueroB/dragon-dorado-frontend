@@ -8,6 +8,7 @@ import KdsMonitor from './pages/kitchen/KdsMonitor';
 import DashboardLayout from './layout/DashboardLayout';
 import DriversPage from './pages/drivers/DriversPage';
 import TablesPage from './pages/tables/TablesPage';
+import ClientsPage from './pages/clients/ClientsPage';
 
 export default function App() {
   return (
@@ -17,8 +18,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path='/conductores' element={<DriversPage />} />
-          <Route path='/mesas' element={<TablesPage />} />
+          <Route path="/conductores" element={<DriversPage />} />
+          <Route path="/mesas" element={<TablesPage />} />
+          <Route path="/clientes" element={<ClientsPage />} />
           <Route path="/salon" element={<TableMap />} />
           <Route path="/cocina" element={<KdsMonitor />} />
         </Route>

@@ -36,6 +36,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const response = error.response;
+    console.log({ response });
 
     if (response && response.status === 401) {
       localStorage.removeItem('accessToken');
@@ -51,16 +52,28 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    if (response && response.status === 403) {
+      toast.error(
+        response?.data?.detail ||
+          'No tienes permiso para realizar esta acción.',
+        { toastId: 'auth-error' },
+      );
+      return Promise.reject(error);
+    }
+
     const data = response?.data;
 
-    if(data?.errors?.length > 0) {
-      const errorMessages : string[] = data.errors;
-      errorMessages.forEach(errorMessage => {
-        toast.error(errorMessage, { autoClose: 15000, toastId: `api-error-${errorMessage}` });
+    if (data?.errors?.length > 0) {
+      const errorMessages: string[] = data.errors;
+      errorMessages.forEach((errorMessage) => {
+        toast.error(errorMessage, {
+          autoClose: 15000,
+          toastId: `api-error-${errorMessage}`,
+        });
       });
       return Promise.reject(error);
     }
-    
+
     const errorMessage = data?.detail || 'Error desconocido';
     toast.error(errorMessage, { toastId: 'api-error' });
 

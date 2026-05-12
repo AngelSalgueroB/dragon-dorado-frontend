@@ -1,5 +1,5 @@
 import apiClient from '../../config/api';
-import { PageResponse } from '../common/interfaces';
+import { PageResponse } from '../common';
 import { ClientResponse, GetClientsParams } from './clients.interfaces';
 
 export async function getClients(
