@@ -52,6 +52,15 @@ apiClient.interceptors.response.use(
     }
 
     const data = response?.data;
+
+    if(data?.errors?.length > 0) {
+      const errorMessages : string[] = data.errors;
+      errorMessages.forEach(errorMessage => {
+        toast.error(errorMessage, { autoClose: 15000, toastId: `api-error-${errorMessage}` });
+      });
+      return Promise.reject(error);
+    }
+    
     const errorMessage = data?.detail || 'Error desconocido';
     toast.error(errorMessage, { toastId: 'api-error' });
 
