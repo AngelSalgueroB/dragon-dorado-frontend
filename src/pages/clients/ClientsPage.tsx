@@ -17,6 +17,7 @@ import { DocumentType, PageResponse } from '../../actions/common';
 import ClientTable from '../../components/clients/ClientTable';
 import CreateClientModal from '../../components/clients/CreateClientModal';
 import EditClientModal from '../../components/clients/EditClientModa';
+import { toLocalDateTime } from '../../utils/convert-to-localdatetime';
 
 const PAGE_SIZE = 20;
 
@@ -141,12 +142,7 @@ export default function ClientsPage() {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-
-  const toLocalDateTime = (date: string) => {
-    if (!date) return undefined;
-    return `${date}T00:00:00`;
-  };
-
+  
   const handleModalSuccess = () => {
     setShowCreate(false);
     setEditingClient(null);

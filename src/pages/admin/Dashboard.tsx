@@ -33,16 +33,14 @@ export default function Dashboard() {
     fetchMetrics();
   }, []);
 
-  // 3. Cálculos dinámicos
   const totalVentas = metrics 
     ? ((metrics.dineInTotal || 0) + (metrics.takeawayTotal || 0) + (metrics.deliveryTotal || 0))
     : 0;
   
-  // Separamos enteros y decimales para mantener tu diseño exacto
   const [enteros, decimales] = totalVentas.toFixed(2).split('.');
   
   const mesasActivas = metrics?.dineInCount || 0;
-  const pedidosCriticos = 0; // Lo dejamos en 0 hasta que el backend tenga estado "crítico"
+  const pedidosCriticos = 0;
 
   const modules = [
     {
@@ -70,13 +68,13 @@ export default function Dashboard() {
       name: 'Finanzas y Reportes',
       icon: <CircleDollarSign size={32} />,
       path: '#',
-      color: 'text-yellow-600', // Ajusté un poco para que no falle si no tienes chifa-gold en tailwind.config
+      color: 'text-yellow-600',
       desc: 'Cierre de caja y rentabilidad.',
     },
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken'); // Borramos la llave al salir
+    localStorage.removeItem('accessToken');
     navigate('/');
   };
 

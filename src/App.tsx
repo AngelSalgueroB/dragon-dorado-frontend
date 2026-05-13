@@ -9,12 +9,14 @@ import DriversPage from './pages/drivers/DriversPage';
 import TablesPage from './pages/tables/TablesPage';
 import ClientsPage from './pages/clients/ClientsPage';
 import UsersPage from './pages/users/UsersPage';
+import ActivateAccountPage from './pages/activate-account/ActivateAccountPage';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path='/activate' element={<ActivateAccountPage />} />
         <Route path="/login" element={<Login />} />
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />

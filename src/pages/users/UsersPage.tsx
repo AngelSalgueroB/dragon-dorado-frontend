@@ -2,13 +2,14 @@ import { Plus, Search, SlidersHorizontal, UserCog, X } from 'lucide-react';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { getUsers } from '../../actions/users/get-users';
 import {
-    GetUsersParams,
-    Role,
-    UserResponse,
+  GetUsersParams,
+  Role,
+  UserResponse,
 } from '../../actions/users/users.interfaces';
 import CreateUserModal from '../../components/users/CreateUserModal';
 import ToggleActiveModal from '../../components/users/ToggleActiveModal';
 import UserTable from '../../components/users/UserTable';
+import { toLocalDateTime } from '../../utils/convert-to-localdatetime';
 
 const roleOptions: { value: Role | ''; label: string }[] = [
   { value: '', label: 'Todos los roles' },
@@ -67,8 +68,9 @@ export default function UsersPage() {
     if (filters.email.trim()) params.email = filters.email.trim();
     if (filters.role) params.role = filters.role as Role;
     if (filters.active !== 'all') params.active = filters.active === 'true';
-    if (filters.startDate) params.startDate = filters.startDate;
-    if (filters.endDate) params.endDate = filters.endDate;
+    if (filters.startDate)
+      params.startDate = toLocalDateTime(filters.startDate);
+    if (filters.endDate) params.endDate = toLocalDateTime(filters.endDate);
     return params;
   };
 

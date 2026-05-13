@@ -22,6 +22,7 @@ export default function Login() {
       const response = await login(request);
 
       localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
 
       navigate('/dashboard');
     } finally {
@@ -53,7 +54,7 @@ export default function Login() {
           <form className="space-y-6" onSubmit={handleRealLogin}>
             {/* Input Usuario */}
             <div className="space-y-2">
-              <label className="text-sm text-gray-300">Usuario / Correo</label>
+              <label className="text-sm text-gray-300">Usuario</label>
               <input
                 type="text"
                 placeholder="Ej: admin_chifa"
