@@ -16,7 +16,7 @@ import {
 import { DocumentType, PageResponse } from '../../actions/common';
 import ClientTable from '../../components/clients/ClientTable';
 import CreateClientModal from '../../components/clients/CreateClientModal';
-import EditClientModal from '../../components/clients/EditClientModa';
+import EditClientModal from '../../components/clients/EditClientModal';
 import { toLocalDateTime } from '../../utils/convert-to-localdatetime';
 
 const PAGE_SIZE = 20;
@@ -103,8 +103,6 @@ export default function ClientsPage() {
       const data = await getClients(buildParams(pageNumber));
       setPage(data);
       setCurrentPage(pageNumber);
-    } catch {
-      // Handled globally by apiClient interceptor
     } finally {
       setLoading(false);
     }
