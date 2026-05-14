@@ -1,6 +1,7 @@
 import { SubmitEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../actions/auth/login';
+import { initAuth } from '../../auth/init-auth';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function Login() {
 
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
+      initAuth();
 
       navigate('/dashboard');
     } finally {
