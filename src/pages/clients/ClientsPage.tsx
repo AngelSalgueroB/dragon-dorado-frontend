@@ -8,11 +8,11 @@ import {
   X,
 } from 'lucide-react';
 import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
-import { getClients } from '../../actions/clients/get-clients';
 import {
   ClientResponse,
   GetClientsParams,
 } from '../../actions/clients/clients.interfaces';
+import { getClients } from '../../actions/clients/get-clients';
 import { DocumentType, PageResponse } from '../../actions/common';
 import ClientTable from '../../components/clients/ClientTable';
 import CreateClientModal from '../../components/clients/CreateClientModal';
@@ -119,20 +119,8 @@ export default function ClientsPage() {
 
   const handleClearFilters = () => {
     setFilters(defaultFilters);
-    // fetch with clean filters immediately
     setCurrentPage(0);
   };
-
-  // Re-fetch when filters are cleared
-  useEffect(() => {
-    if (
-      Object.entries(filters).every(([key, val]) =>
-        key === 'active' ? val === 'all' : val === '',
-      )
-    ) {
-      fetchClients(0);
-    }
-  }, [filters]);
 
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,

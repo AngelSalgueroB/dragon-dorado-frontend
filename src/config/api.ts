@@ -1,13 +1,20 @@
+import * as jose from 'jose';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { JwtResponse } from '../actions/auth/auth.interfaces';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   timeout: 5000,
 });
 
+const authApi = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL,
+  timeout: 5000,
+});
+
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const excludedEndpoints = ['/auth/login', '/auth/refresh'];
     const shouldExclude = excludedEndpoints.some((route) =>
       config.url?.includes(route),
@@ -16,6 +23,8 @@ apiClient.interceptors.request.use(
     if (shouldExclude) {
       return config;
     }
+
+    await handleTokenRefresh();
 
     const accessToken = localStorage.getItem('accessToken');
 
@@ -36,7 +45,6 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const response = error.response;
-    console.log({ response });
 
     if (response && response.status === 401) {
       localStorage.removeItem('accessToken');
@@ -80,5 +88,31 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+async function handleTokenRefresh(): Promise<void> {
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) return;
+
+  const decoded = jose.decodeJwt(accessToken);
+  const exp = decoded.exp || 0;
+  const now = Math.floor(Date.now() / 1000);
+
+  const isExpired = exp < now;
+  if (!isExpired) return;
+
+  const refreshTokenValue = localStorage.getItem('refreshToken');
+  if (!refreshTokenValue) {
+    localStorage.removeItem('accessToken');
+    return;
+  }
+
+  const response = await authApi.post<JwtResponse>('/auth/refresh', {
+    refreshToken: refreshTokenValue,
+  });
+  console.log({response});
+  
+  localStorage.setItem('accessToken', response.data.accessToken);
+  localStorage.setItem('refreshToken', response.data.refreshToken);
+}
 
 export default apiClient;

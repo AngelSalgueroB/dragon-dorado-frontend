@@ -170,11 +170,7 @@ export default function OrdersPage() {
   };
 
   const handleClearFilters = () => setFilters(defaultFilters);
-
-  useEffect(() => {
-    if (Object.values(filters).every((v) => v === '')) fetchOrders(0);
-  }, [filters]);
-
+  
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {

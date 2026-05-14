@@ -97,13 +97,6 @@ export default function UsersPage() {
     setFilters(defaultFilters);
   };
 
-  useEffect(() => {
-    const isClean = Object.entries(filters).every(([key, val]) =>
-      key === 'active' ? val === 'all' : val === '',
-    );
-    if (isClean) fetchUsers();
-  }, [filters]);
-
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
