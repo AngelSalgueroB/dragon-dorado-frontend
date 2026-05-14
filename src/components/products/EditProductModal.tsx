@@ -1,5 +1,5 @@
 import { ImagePlus, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useEffect, useRef, useState } from 'react';
 import {
   ProductCategoryResponse,
   ProductResponse,
@@ -65,7 +65,7 @@ export default function EditProductModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
+    e: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
@@ -83,7 +83,7 @@ export default function EditProductModal({
       setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -105,7 +105,7 @@ export default function EditProductModal({
     setErrors((prev) => ({ ...prev, image: undefined }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);

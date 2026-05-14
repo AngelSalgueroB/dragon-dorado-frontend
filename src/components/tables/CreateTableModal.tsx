@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { SubmitEvent, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useState } from 'react';
 import { CreateTableRequest } from '../../actions/tables/tables.interfaces';
 import { createTable } from '../../actions/tables/create-table';
 
@@ -26,7 +26,7 @@ export default function CreateTableModal({
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target;
     setForm((prev) => ({

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { ChangeEvent, SubmitEvent, useState } from 'react';
 import { DocumentType } from '../../actions/common';
 import { CreateClientRequest } from '../../actions/clients/clients.interfaces';
 import { createClient } from '../../actions/clients/create-client';
@@ -73,7 +73,7 @@ export default function CreateClientModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -82,7 +82,7 @@ export default function CreateClientModal({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);

@@ -1,7 +1,7 @@
 // src/components/categories/CreateCategoryModal.tsx
 
 import { X } from 'lucide-react';
-import { SubmitEvent, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import { CreateCategoryRequest } from '../../actions/category/category.interfaces';
 import { createCategory } from '../../actions/category/create-category';
@@ -55,7 +55,7 @@ export default function CreateCategoryModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 

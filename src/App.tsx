@@ -13,6 +13,7 @@ import ActivateAccountPage from './pages/activate-account/ActivateAccountPage';
 import CategoriesPage from './pages/categories/CategoriesPage';
 import ProductPage from './pages/products/ProductsPage';
 import CashRegisterPage from './pages/cash-register/CashRegisterPage';
+import OrdersPage from './pages/orders/OrdersPage';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/categorias" element={<CategoriesPage />} />
           <Route path="/productos" element={<ProductPage />} />
           <Route path="/caja" element={<CashRegisterPage />} />
+          <Route path="/ordenes" element={<OrdersPage />} />
 
 
           <Route path="/salon" element={<TableMap />} />

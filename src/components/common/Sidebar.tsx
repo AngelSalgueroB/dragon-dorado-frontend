@@ -11,12 +11,12 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface NavItem {
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   path: string;
   section: string;
 }

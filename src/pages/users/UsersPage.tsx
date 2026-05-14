@@ -1,5 +1,5 @@
 import { Plus, Search, SlidersHorizontal, UserCog, X } from 'lucide-react';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
 import { getUsers } from '../../actions/users/get-users';
 import {
   GetUsersParams,
@@ -88,7 +88,7 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     fetchUsers();
   };

@@ -7,7 +7,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { getCashRegisters } from '../../actions/cash-register/get-cash-registers';
 import {
   CashRegisterResponse,
@@ -98,7 +98,7 @@ export default function CashRegisterPage() {
   }, [filters]);
 
   const handleFilterChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));

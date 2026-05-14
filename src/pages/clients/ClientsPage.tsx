@@ -7,7 +7,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
 import { getClients } from '../../actions/clients/get-clients';
 import {
   ClientResponse,
@@ -112,7 +112,7 @@ export default function ClientsPage() {
     fetchClients(0);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     fetchClients(0);
   };
@@ -135,12 +135,12 @@ export default function ClientsPage() {
   }, [filters]);
 
   const handleFilterChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const handleModalSuccess = () => {
     setShowCreate(false);
     setEditingClient(null);

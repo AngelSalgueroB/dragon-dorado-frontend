@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
 import { updateTable } from '../../actions/tables/update-table';
 import {
   TableResponse,
@@ -64,7 +64,7 @@ export default function EditTableModal({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {

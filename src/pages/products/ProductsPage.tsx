@@ -7,7 +7,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
 import { getProducts } from '../../actions/products/get-products';
 import {
   GetProductsParams,
@@ -110,7 +110,7 @@ export default function ProductsPage() {
     fetchCategories();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     fetchProducts(0);
   };

@@ -1,5 +1,5 @@
 import { ImagePlus, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ChangeEvent, SubmitEvent, useEffect, useRef, useState } from 'react';
 import { CreateProductRequest } from '../../actions/products/products.interfaces';
 import { createProduct } from '../../actions/products/create-product';
 import { CategoryResponse } from '../../actions/category/category.interfaces';
@@ -59,9 +59,7 @@ export default function CreateProductModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value, type } = e.target;
     setForm((prev) => ({
@@ -72,7 +70,7 @@ export default function CreateProductModal({
       setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -94,7 +92,7 @@ export default function CreateProductModal({
     setErrors((prev) => ({ ...prev, image: undefined }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
