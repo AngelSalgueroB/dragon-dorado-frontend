@@ -12,6 +12,7 @@ import UsersPage from './pages/users/UsersPage';
 import ActivateAccountPage from './pages/activate-account/ActivateAccountPage';
 import CategoriesPage from './pages/categories/CategoriesPage';
 import ProductPage from './pages/products/ProductsPage';
+import CashRegisterPage from './pages/cash-register/CashRegisterPage';
 
 export default function App() {
   return (
@@ -20,7 +21,9 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/activate" element={<ActivateAccountPage />} />
         <Route path="/login" element={<Login />} />
+
         <Route element={<DashboardLayout />}>
+
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/conductores" element={<DriversPage />} />
           <Route path="/mesas" element={<TablesPage />} />
@@ -28,6 +31,9 @@ export default function App() {
           <Route path="/usuarios" element={<UsersPage />} />
           <Route path="/categorias" element={<CategoriesPage />} />
           <Route path="/productos" element={<ProductPage />} />
+          <Route path="/caja" element={<CashRegisterPage />} />
+
+
           <Route path="/salon" element={<TableMap />} />
           <Route path="/cocina" element={<KdsMonitor />} />
         </Route>
