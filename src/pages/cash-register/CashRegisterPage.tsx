@@ -18,7 +18,6 @@ import { PageResponse } from '../../actions/common';
 import CashRegisterTable from '../../components/cash-register/CashRegisterTable';
 import OpenCashRegisterModal from '../../components/cash-register/OpenCashRegisterModal';
 import CloseCashRegisterModal from '../../components/cash-register/CloseCashRegisterModal';
-import { toLocalDateTime } from '../../utils/convert-to-localdatetime';
 
 const PAGE_SIZE = 10;
 
@@ -86,16 +85,9 @@ export default function CashRegisterPage() {
 
   useEffect(() => {
     fetchRegisters(0);
-  }, []);
+  }, [filters]);
 
   const handleClearFilters = () => setFilters(defaultFilters);
-
-  useEffect(() => {
-    const isClean = Object.entries(filters).every(([key, val]) =>
-      key === 'status' ? val === 'all' : val === '',
-    );
-    if (isClean) fetchRegisters(0);
-  }, [filters]);
 
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -209,7 +201,6 @@ export default function CashRegisterPage() {
                 type="button"
                 onClick={() => {
                   setFilters((p) => ({ ...p, status: val }));
-                  fetchRegisters(0);
                 }}
                 className={`px-3 py-2 text-xs font-bold transition-all flex items-center gap-1.5 ${
                   filters.status === val
