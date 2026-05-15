@@ -164,3 +164,51 @@ export interface GetOrdersParams extends PageableParams {
   minTransactionDate?: string;
   maxTransactionDate?: string;
 }
+
+
+export interface OrderItemRequest {
+  quantity: number;
+  productId: number;
+  details?: string;
+}
+
+export interface DeliveryAddressRequest {
+  phoneNumber: string;
+  addressLine: string;
+  reference?: string;
+  googleMapsLink?: string;
+  details?: string;
+}
+
+interface BaseCreateOrderRequest {
+  details?: string;
+  items: OrderItemRequest[];
+}
+
+export interface CreateDineInOrderRequest
+  extends BaseCreateOrderRequest {
+  orderType: OrderType.DINE_IN;
+  tableId: number;
+}
+
+export interface CreateTakeAwayOrderRequest
+  extends BaseCreateOrderRequest {
+  orderType: OrderType.TAKEAWAY;
+}
+
+export interface CreateDeliveryOrderRequest
+  extends BaseCreateOrderRequest {
+  orderType: OrderType.DELIVERY;
+
+  deliveryDriverId: number;
+  deliveryFee: number;
+
+  deliveryAddress: DeliveryAddressRequest;
+
+  clientId?: number;
+}
+
+export type CreateOrderRequest =
+  | CreateDineInOrderRequest
+  | CreateTakeAwayOrderRequest
+  | CreateDeliveryOrderRequest;

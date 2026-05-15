@@ -15,6 +15,7 @@ import ProductPage from './pages/products/ProductsPage';
 import CashRegisterPage from './pages/cash-register/CashRegisterPage';
 import OrdersPage from './pages/orders/OrdersPage';
 import ProtectedRoute from './guards/ProtectedRoute';
+import PosPage from './pages/pos/PosPage';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/pedidos" element={<PosPage />} />
             <Route path="/conductores" element={<DriversPage />} />
             <Route path="/mesas" element={<TablesPage />} />
             <Route path="/clientes" element={<ClientsPage />} />

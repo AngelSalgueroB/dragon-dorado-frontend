@@ -4,6 +4,7 @@ import {
   ChevronRight,
   ClipboardList,
   Cpu,
+  History,
   LayoutGrid,
   Package,
   Tag,
@@ -22,6 +23,12 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  {
+    label: 'Pedidos',
+    icon: <ClipboardList size={18} />,
+    path: '/pedidos',
+    section: 'Operaciones',
+  },
   {
     label: 'Usuarios',
     icon: <Users size={18} />,
@@ -48,7 +55,7 @@ const navItems: NavItem[] = [
   },
   {
     label: 'Órdenes',
-    icon: <ClipboardList size={18} />,
+    icon: <History size={18} />,
     path: '/ordenes',
     section: 'Salón',
   },
