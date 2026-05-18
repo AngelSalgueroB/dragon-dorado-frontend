@@ -97,8 +97,11 @@ export default function Sidebar() {
       }`}
     >
       {/* Logo */}
-      <div
-        className={`relative flex items-center min-h-[72px] border-b border-gray-200 ${
+      <button
+        type="button"
+        onClick={() => navigate('/dashboard')}
+        title="Ir al dashboard"
+        className={`relative flex items-center min-h-[72px] border-b border-gray-200 w-full text-left transition-colors hover:bg-gray-50 cursor-pointer ${
           collapsed ? 'justify-center' : 'gap-3 px-5'
         }`}
       >
@@ -120,7 +123,7 @@ export default function Sidebar() {
             </p>
           </div>
         )}
-      </div>
+      </button>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3">
