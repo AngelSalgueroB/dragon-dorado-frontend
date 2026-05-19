@@ -42,21 +42,25 @@ export default function ActivateAccountPage() {
 
     if (!token) return;
 
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    const response = await activateAccount({
-      accountActivationToken: token,
-      newPassword: password,
-    });
+      const response = await activateAccount({
+        accountActivationToken: token,
+        newPassword: password,
+      });
 
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
 
-    setIsActivated(true);
-    setIsLoading(false);
+      setIsActivated(true);
+      setIsLoading(false);
 
-    toast.success('Cuenta activada correctamente');
-    navigate('/dashboard');
+      toast.success('Cuenta activada correctamente');
+      navigate('/dashboard');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
