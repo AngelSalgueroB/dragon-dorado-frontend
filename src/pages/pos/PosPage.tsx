@@ -18,6 +18,7 @@ import {
 import OrderCard, { statusConfig } from '../../components/pos/OrderCard';
 import PosOrderDetailModal from '../../components/pos/PosOrderDetailModal';
 import { getPosOrders } from '../../actions/orders/get-pos-orders';
+import { toast } from 'react-toastify';
 
 // Active statuses to show in the POS (completed/cancelled are in history)
 const ACTIVE_STATUSES: OrderStatus[] = [
@@ -92,7 +93,11 @@ export default function PosPage() {
       // New order
       client.subscribe('/topic/orders/new', (msg) => {
         const newOrder: OrderResponse = JSON.parse(msg.body);
-        setOrders((prev) => [newOrder, ...prev]);
+        setOrders((prev) => {
+          if (prev.some((o) => o.id === newOrder.id)) return prev; // if already exists, skip (can happen on initial load)
+          toast.info(`Nueva orden #${newOrder.id} (${newOrder.orderType})`);
+          return [newOrder, ...prev];
+        });
         setLastUpdated(new Date());
       });
 
