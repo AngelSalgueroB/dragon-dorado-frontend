@@ -2,13 +2,15 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
-  FileText,
   Loader2,
   SlidersHorizontal,
   X,
 } from 'lucide-react';
 import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
+import { PageResponse } from '../../actions/common';
 import { DeliveryPlatform } from '../../actions/delivery-drivers/delivery-drivers.interface';
+import { getOrderPreCheck } from '../../actions/orders/generate-pre-check';
+import { getOrders } from '../../actions/orders/get-orders';
 import {
   GetOrdersParams,
   OrderResponse,
@@ -16,11 +18,8 @@ import {
   OrderType,
   PaymentMethod,
 } from '../../actions/orders/orders.interface';
-import { PageResponse } from '../../actions/common';
-import { getOrders } from '../../actions/orders/get-orders';
-import { getOrderPreCheck } from '../../actions/orders/generate-pre-check';
-import OrdersTable from '../../components/orders/OrdersTable';
 import OrderDetailModal from '../../components/orders/OrderDetailModal';
+import OrdersTable from '../../components/orders/OrdersTable';
 
 const PAGE_SIZE = 15;
 
@@ -149,6 +148,38 @@ export default function OrdersPage() {
     return params;
   };
 
+  const buildParamsFrom = (
+    filters: Filters,
+    pageNumber: number,
+  ): GetOrdersParams => {
+    const params: GetOrdersParams = {
+      page: pageNumber,
+      size: PAGE_SIZE,
+      sort: ['createdAt,desc'],
+    };
+
+    if (filters.status) params.status = filters.status;
+    if (filters.orderType) params.orderType = filters.orderType;
+    if (filters.clientName.trim())
+      params.clientName = filters.clientName.trim();
+    if (filters.clientPhoneNumber.trim())
+      params.clientPhoneNumber = filters.clientPhoneNumber.trim();
+    if (filters.invoiceNumber.trim())
+      params.invoiceNumber = filters.invoiceNumber.trim();
+    if (filters.minTotal) params.minTotal = Number(filters.minTotal);
+    if (filters.maxTotal) params.maxTotal = Number(filters.maxTotal);
+    if (filters.minDate) params.minDate = filters.minDate;
+    if (filters.maxDate) params.maxDate = filters.maxDate;
+    if (filters.tableNumber) params.tableNumber = Number(filters.tableNumber);
+    if (filters.paymentMethod) params.paymentMethod = filters.paymentMethod;
+    if (filters.deliveryDriverName.trim())
+      params.deliveryDriverName = filters.deliveryDriverName.trim();
+    if (filters.deliveryDriverPlatform)
+      params.deliveryDriverPlatform = filters.deliveryDriverPlatform;
+
+    return params;
+  };
+
   const fetchOrders = async (pageNumber = 0) => {
     setLoading(true);
     try {
@@ -169,8 +200,19 @@ export default function OrdersPage() {
     fetchOrders(0);
   };
 
+  const fetchOrdersWith = async (filtersArg: Filters, pageNumber = 0) => {
+    setLoading(true);
+    try {
+      const data = await getOrders(buildParamsFrom(filtersArg, pageNumber));
+      setPage(data);
+      setCurrentPage(pageNumber);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleClearFilters = () => setFilters(defaultFilters);
-  
+
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -226,8 +268,9 @@ export default function OrdersPage() {
             key={opt.value}
             type="button"
             onClick={() => {
-              setFilters((p) => ({ ...p, orderType: opt.value }));
-              fetchOrders(0);
+              const next = { ...filters, orderType: opt.value };
+              setFilters(next);
+              fetchOrdersWith(next, 0);
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               filters.orderType === opt.value
