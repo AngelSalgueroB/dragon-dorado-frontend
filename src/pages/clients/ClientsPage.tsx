@@ -19,7 +19,7 @@ import CreateClientModal from '../../components/clients/CreateClientModal';
 import EditClientModal from '../../components/clients/EditClientModal';
 import { toLocalDateTime } from '../../utils/convert-to-localdatetime';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const documentOptions = [
   { value: DocumentType.DNI, label: 'DNI' },
@@ -337,7 +337,7 @@ export default function ClientsPage() {
       </form>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <ClientTable
           clients={page.content}
           loading={loading}

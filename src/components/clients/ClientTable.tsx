@@ -46,8 +46,8 @@ export default function ClientTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full min-w-[900px] text-sm">
         <thead>
           <tr className="border-b border-gray-200">
             {['Cliente', 'Documento', 'Teléfono', 'Email', 'Estado', ''].map(
@@ -83,7 +83,7 @@ export default function ClientTable({
               </td>
 
               {/* Documento */}
-              <td className="px-4 py-3">
+              <td className="px-4 py-3 whitespace-nowrap">
                 {client.documentNumber ? (
                   <>
                     <span className="text-[10px] font-black text-gray-400 uppercase mr-1">
@@ -101,12 +101,15 @@ export default function ClientTable({
               </td>
 
               {/* Teléfono */}
-              <td className="px-4 py-3 text-gray-600 font-mono text-xs">
+              <td className="px-4 py-3 text-gray-600 font-mono text-xs whitespace-nowrap">
                 {client.phoneNumber}
               </td>
 
               {/* Email */}
-              <td className="px-4 py-3 text-gray-500 text-xs">
+              <td
+                className="px-4 py-3 text-gray-500 text-xs max-w-[240px] truncate"
+                title={client.email || undefined}
+              >
                 {client.email || <span className="text-gray-300">—</span>}
               </td>
 
