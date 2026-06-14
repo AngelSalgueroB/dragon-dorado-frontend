@@ -19,6 +19,7 @@ import OrderCard, { statusConfig } from '../../components/pos/OrderCard';
 import PosOrderDetailModal from '../../components/pos/PosOrderDetailModal';
 import { getPosOrders } from '../../actions/orders/get-pos-orders';
 import { toast } from 'react-toastify';
+import { Client } from '@stomp/stompjs';
 
 // Active statuses to show in the POS (completed/cancelled are in history)
 const ACTIVE_STATUSES: OrderStatus[] = [
@@ -70,6 +71,7 @@ const typeFilter = [
 export default function PosPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [wsClient, setWsClient] = useState<Client | null>(null);
   const [wsConnected, setWsConnected] = useState(false);
   const [selectedType, setSelectedType] = useState<OrderType | 'ALL'>('ALL');
   const [viewingOrder, setViewingOrder] = useState<OrderResponse | null>(null);
@@ -88,25 +90,34 @@ export default function PosPage() {
     loadPosOrders();
 
     connectWebSocket((client) => {
+      setWsClient(client);
       setWsConnected(true);
 
-      // New order
       client.subscribe('/topic/orders/new', (msg) => {
         const newOrder: OrderResponse = JSON.parse(msg.body);
+
         setOrders((prev) => {
-          if (prev.some((o) => o.id === newOrder.id)) return prev; // if already exists, skip (can happen on initial load)
+          if (prev.some((o) => o.id === newOrder.id)) return prev;
           toast.info(`Nueva orden #${newOrder.id} (${newOrder.orderType})`);
           return [newOrder, ...prev];
         });
+
         setLastUpdated(new Date());
       });
 
-      // Order updated (if your backend publishes status changes)
-      client.subscribe('/topic/orders/updated', (msg) => {
+      client.subscribe('/topic/orders/update', (msg) => {
         const updated: OrderResponse = JSON.parse(msg.body);
-        setOrders((prev) =>
-          prev.map((o) => (o.id === updated.id ? updated : o)),
-        );
+
+        setOrders((prev) => {
+          const exists = prev.some((o) => o.id === updated.id);
+
+          if (!exists) {
+            return [updated, ...prev];
+          }
+
+          return prev.map((o) => (o.id === updated.id ? updated : o));
+        });
+
         setLastUpdated(new Date());
       });
     });
@@ -283,6 +294,7 @@ export default function PosPage() {
       {viewingOrder && (
         <PosOrderDetailModal
           order={viewingOrder}
+          wsClient={wsClient}
           onClose={() => setViewingOrder(null)}
           onUpdated={handleOrderUpdated}
         />

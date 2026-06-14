@@ -1,9 +1,12 @@
-import { ClientResponse } from "../clients/clients.interfaces";
-import { PageableParams } from "../common";
-import { DeliveryAddressResponse } from "../delivery-addresses/delivery-addresses.interfaces";
-import { DeliveryDriverResponse, DeliveryPlatform } from "../delivery-drivers/delivery-drivers.interface";
-import { TableResponse, TableStatus } from "../tables/tables.interfaces";
-import { UserResponse } from "../users/users.interfaces";
+import { ClientResponse } from '../clients/clients.interfaces';
+import { PageableParams } from '../common';
+import { DeliveryAddressResponse } from '../delivery-addresses/delivery-addresses.interfaces';
+import {
+  DeliveryDriverResponse,
+  DeliveryPlatform,
+} from '../delivery-drivers/delivery-drivers.interface';
+import { TableResponse, TableStatus } from '../tables/tables.interfaces';
+import { UserResponse } from '../users/users.interfaces';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -56,7 +59,6 @@ export interface OrderItemResponse {
 
   details: string;
 }
-
 
 export interface OrderResponse {
   id: number;
@@ -165,7 +167,6 @@ export interface GetOrdersParams extends PageableParams {
   maxTransactionDate?: string;
 }
 
-
 export interface OrderItemRequest {
   quantity: number;
   productId: number;
@@ -185,19 +186,16 @@ interface BaseCreateOrderRequest {
   items: OrderItemRequest[];
 }
 
-export interface CreateDineInOrderRequest
-  extends BaseCreateOrderRequest {
+export interface CreateDineInOrderRequest extends BaseCreateOrderRequest {
   orderType: OrderType.DINE_IN;
   tableId: number;
 }
 
-export interface CreateTakeAwayOrderRequest
-  extends BaseCreateOrderRequest {
+export interface CreateTakeAwayOrderRequest extends BaseCreateOrderRequest {
   orderType: OrderType.TAKEAWAY;
 }
 
-export interface CreateDeliveryOrderRequest
-  extends BaseCreateOrderRequest {
+export interface CreateDeliveryOrderRequest extends BaseCreateOrderRequest {
   orderType: OrderType.DELIVERY;
 
   deliveryDriverId: number;
@@ -212,3 +210,11 @@ export type CreateOrderRequest =
   | CreateDineInOrderRequest
   | CreateTakeAwayOrderRequest
   | CreateDeliveryOrderRequest;
+
+export interface UpdateOrderRequest {
+  orderId: number;
+  status: OrderStatus;
+  details?: string;
+  paymentMethod?: PaymentMethod;
+  paymentDetails?: string;
+}

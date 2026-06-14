@@ -17,6 +17,8 @@ import OrdersPage from './pages/orders/OrdersPage';
 import ProtectedRoute from './guards/ProtectedRoute';
 import PosPage from './pages/pos/PosPage';
 import CreateDineInOrderPage from './pages/pos/CreateDineInOrderPage';
+import CreateTakeAwayOrderPage from './pages/pos/CreateTakeAwayOrderPage';
+import CreateDeliveryOrderPage from './pages/pos/CreateDeliveryOrderPage';
 
 export default function App() {
   return (
@@ -31,6 +33,8 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/pedidos" element={<PosPage />} />
             <Route path="/pedidos/salon" element={<CreateDineInOrderPage />} />
+            <Route path="/pedidos/para-llevar" element={<CreateTakeAwayOrderPage />} />
+            <Route path="/pedidos/delivery" element={<CreateDeliveryOrderPage />} />
             <Route path="/conductores" element={<DriversPage />} />
             <Route path="/mesas" element={<TablesPage />} />
             <Route path="/clientes" element={<ClientsPage />} />

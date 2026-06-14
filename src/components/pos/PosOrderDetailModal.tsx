@@ -18,22 +18,50 @@ import {
 } from '../../actions/orders/orders.interface';
 import { getOrderById } from '../../actions/orders/get-order-by-id';
 import { getOrderPreCheck } from '../../actions/orders/generate-pre-check';
+import { Client } from '@stomp/stompjs';
+import { cancelOrder, updateOrder } from '../../actions/orders/update-order';
+import { PaymentMethod } from '../../actions/orders/orders.interface';
+import { toast } from 'react-toastify';
 
 interface PosOrderDetailModalProps {
   order: OrderResponse;
+  wsClient: Client | null;
   onClose: () => void;
   onUpdated: () => void;
 }
 
 // Status transitions per type
-const statusFlow: Partial<Record<OrderStatus, OrderStatus[]>> = {
-  [OrderStatus.PENDING]: [OrderStatus.PREPARING],
-  [OrderStatus.PREPARING]: [OrderStatus.READY],
-  [OrderStatus.READY]: [OrderStatus.SERVED, OrderStatus.OUT_FOR_DELIVERY],
-  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED],
-  [OrderStatus.DELIVERED]: [OrderStatus.COMPLETED],
-  [OrderStatus.SERVED]: [OrderStatus.COMPLETED],
-};
+function getNextStatuses(
+  currentStatus: OrderStatus,
+  orderType: OrderType,
+): OrderStatus[] {
+  if (currentStatus === OrderStatus.PENDING) {
+    return [OrderStatus.PREPARING];
+  }
+
+  if (currentStatus === OrderStatus.PREPARING) {
+    return [OrderStatus.READY];
+  }
+
+  if (currentStatus === OrderStatus.READY) {
+    return orderType === OrderType.DELIVERY
+      ? [OrderStatus.OUT_FOR_DELIVERY]
+      : [OrderStatus.SERVED];
+  }
+
+  if (currentStatus === OrderStatus.OUT_FOR_DELIVERY) {
+    return [OrderStatus.DELIVERED];
+  }
+
+  if (
+    currentStatus === OrderStatus.DELIVERED ||
+    currentStatus === OrderStatus.SERVED
+  ) {
+    return [OrderStatus.COMPLETED];
+  }
+
+  return [];
+}
 
 const nextStatusLabel: Partial<Record<OrderStatus, string>> = {
   [OrderStatus.PENDING]: 'Marcar como Preparando',
@@ -81,6 +109,7 @@ export default function PosOrderDetailModal({
   order,
   onClose,
   onUpdated,
+  wsClient,
 }: PosOrderDetailModalProps) {
   const [detail, setDetail] = useState<OrderFullResponse | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(true);
@@ -90,6 +119,10 @@ export default function PosOrderDetailModal({
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(order.status);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PaymentMethod.CASH,
+  );
+  const [paymentDetails, setPaymentDetails] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -103,23 +136,49 @@ export default function PosOrderDetailModal({
     })();
   }, [order.id]);
 
-  const handleUpdateStatus = async (newStatus: OrderStatus) => {
+  const handleUpdateStatus = (newStatus: OrderStatus) => {
     setUpdatingStatus(newStatus);
+
     try {
-      // NOTE: Replace with your actual action
-      // await updateOrderStatus(order.id, newStatus);
-      console.log(`Update order ${order.id} to status ${newStatus}`);
-      setCurrentStatus(newStatus);
+      updateOrder(wsClient, {
+        orderId: order.id,
+        status: newStatus,
+        details: detail?.details ?? order.details ?? undefined,
+        paymentMethod:
+          newStatus === OrderStatus.COMPLETED ? paymentMethod : undefined,
+        paymentDetails:
+          newStatus === OrderStatus.COMPLETED
+            ? paymentDetails || undefined
+            : undefined,
+      });
+
+      toast.info(`Actualización enviada para la orden #${order.id}`);
       onUpdated();
+    } catch {
+      toast.error('No se pudo enviar la actualización por WebSocket.');
     } finally {
       setUpdatingStatus(null);
     }
   };
 
-  const handleCancel = async () => {
-    await handleUpdateStatus(OrderStatus.CANCELLED);
-    setShowCancelConfirm(false);
-    onClose();
+  const handleCancel = () => {
+    setUpdatingStatus(OrderStatus.CANCELLED);
+
+    try {
+      cancelOrder(
+        wsClient,
+        order.id,
+        detail?.details ?? order.details ?? undefined,
+      );
+
+      toast.info(`Cancelación enviada para la orden #${order.id}`);
+      setShowCancelConfirm(false);
+      onUpdated();
+    } catch {
+      toast.error('No se pudo enviar la cancelación por WebSocket.');
+    } finally {
+      setUpdatingStatus(null);
+    }
   };
 
   const handlePreCheck = async () => {
@@ -138,7 +197,7 @@ export default function PosOrderDetailModal({
   };
 
   const cfg = statusConfig[currentStatus];
-  const nextStatuses = statusFlow[currentStatus] ?? [];
+  const nextStatuses = getNextStatuses(currentStatus, order.orderType);
   const isFinal = [OrderStatus.COMPLETED, OrderStatus.CANCELLED].includes(
     currentStatus,
   );
@@ -371,6 +430,44 @@ export default function PosOrderDetailModal({
               </p>
             </div>
           </div>
+
+          {nextStatuses.includes(OrderStatus.COMPLETED) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                  Método de pago
+                </label>
+
+                <select
+                  value={paymentMethod}
+                  onChange={(e) =>
+                    setPaymentMethod(e.target.value as PaymentMethod)
+                  }
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-red-800/20 focus:border-red-800"
+                >
+                  {Object.values(PaymentMethod).map((method) => (
+                    <option key={method} value={method}>
+                      {paymentMethodLabel[method]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                  Detalle de pago
+                </label>
+
+                <input
+                  type="text"
+                  value={paymentDetails}
+                  onChange={(e) => setPaymentDetails(e.target.value)}
+                  placeholder="Ej. operación Yape, vuelto, referencia..."
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 outline-none focus:ring-2 focus:ring-red-800/20 focus:border-red-800"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Status actions */}
           {!isFinal && (
