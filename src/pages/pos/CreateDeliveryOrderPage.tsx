@@ -378,7 +378,7 @@ export default function CreateDeliveryOrderPage() {
                         e.target.value ? Number(e.target.value) : '',
                       )
                     }
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 transition-all"
+                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 text-black/80 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 transition-all"
                   >
                     <option value="">Seleccionar</option>
                     {drivers.map((driver) => (
