@@ -2,6 +2,9 @@ import { SubmitEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../actions/auth/login';
 import { initAuth } from '../../auth/init-auth';
+import { getHomePathForRole } from '../../auth/role-permissions';
+import { disconnectWebSocket } from '../../config/websocket';
+import useAuthStore from '../../store/auth.store';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,11 +25,13 @@ export default function Login() {
 
       const response = await login(request);
 
+      disconnectWebSocket();
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       initAuth();
 
-      navigate('/dashboard');
+      const user = useAuthStore.getState().user;
+      navigate(getHomePathForRole(user?.role));
     } finally {
       setIsLoading(false);
     }

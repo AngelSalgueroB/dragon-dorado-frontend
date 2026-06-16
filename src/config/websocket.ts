@@ -4,12 +4,32 @@ import SockJS from 'sockjs-client';
 
 let clientWs: Client | null = null;
 let errorSubscribed = false;
+let connectedToken: string | null = null;
 
+export function disconnectWebSocket() {
+  if (clientWs) {
+    clientWs.deactivate();
+  }
+
+  clientWs = null;
+  errorSubscribed = false;
+  connectedToken = null;
+}
 
 export function connectWebSocket(onReady?: (client: Client) => void) {
+  const currentToken = localStorage.getItem('accessToken');
+
+  if (!currentToken) {
+    throw new Error('No token');
+  }
+
   if (clientWs?.connected) {
-    onReady?.(clientWs);
-    return;
+    if (connectedToken === currentToken) {
+      onReady?.(clientWs);
+      return;
+    }
+
+    disconnectWebSocket();
   }
 
   clientWs = new Client({
@@ -28,6 +48,7 @@ export function connectWebSocket(onReady?: (client: Client) => void) {
     },
 
     onConnect: () => {
+      connectedToken = localStorage.getItem('accessToken');
       console.log('WebSocket conectado');
 
       if (!errorSubscribed) {

@@ -20,6 +20,8 @@ import PosOrderDetailModal from '../../components/pos/PosOrderDetailModal';
 import { getPosOrders } from '../../actions/orders/get-pos-orders';
 import { toast } from 'react-toastify';
 import { Client } from '@stomp/stompjs';
+import useAuthStore from '../../store/auth.store';
+import { canCreateOrders } from '../../auth/role-permissions';
 
 // Active statuses to show in the POS (completed/cancelled are in history)
 const ACTIVE_STATUSES: OrderStatus[] = [
@@ -70,6 +72,7 @@ const typeFilter = [
 
 export default function PosPage() {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [wsClient, setWsClient] = useState<Client | null>(null);
   const [wsConnected, setWsConnected] = useState(false);
@@ -146,6 +149,7 @@ export default function PosPage() {
   };
 
   const totalActive = activeOrders.length;
+  const showNewOrderButtons = canCreateOrders(user?.role);
   const pendingCount = activeOrders.filter(
     (o) => o.status === OrderStatus.PENDING,
   ).length;
@@ -178,16 +182,17 @@ export default function PosPage() {
 
         {/* New order buttons */}
         <div className="flex items-center gap-2">
-          {newOrderButtons.map((btn) => (
-            <button
-              key={btn.path}
-              onClick={() => navigate(btn.path)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-wide transition-all shadow-sm ${btn.color}`}
-            >
-              {btn.icon}
-              {btn.label}
-            </button>
-          ))}
+          {showNewOrderButtons &&
+            newOrderButtons.map((btn) => (
+              <button
+                key={btn.path}
+                onClick={() => navigate(btn.path)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-wide transition-all shadow-sm ${btn.color}`}
+              >
+                {btn.icon}
+                {btn.label}
+              </button>
+            ))}
         </div>
 
         {/* WS status + time */}

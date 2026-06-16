@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Cpu,
   History,
+  LayoutDashboard,
   LayoutGrid,
   Package,
   Tag,
@@ -14,81 +15,118 @@ import {
 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Role } from '../../actions/users/users.interfaces';
+import { getHomePathForRole } from '../../auth/role-permissions';
+import useAuthStore from '../../store/auth.store';
 
 interface NavItem {
   label: string;
   icon: ReactNode;
   path: string;
   section: string;
+  roles: Role[];
 }
 
+const ADMIN_MANAGER = [Role.ADMIN, Role.MANAGER];
+const ALL_ROLES = [
+  Role.ADMIN,
+  Role.MANAGER,
+  Role.WAITER,
+  Role.CASHIER,
+  Role.KITCHEN,
+];
+
 const navItems: NavItem[] = [
+  {
+    label: 'Dashboard',
+    icon: <LayoutDashboard size={18} />,
+    path: '/dashboard',
+    section: 'Principal',
+    roles: ADMIN_MANAGER,
+  },
   {
     label: 'Pedidos',
     icon: <ClipboardList size={18} />,
     path: '/pedidos',
     section: 'Operaciones',
+    roles: ALL_ROLES,
   },
   {
     label: 'Usuarios',
     icon: <Users size={18} />,
     path: '/usuarios',
     section: 'Gestión',
+    roles: ADMIN_MANAGER,
   },
   {
     label: 'Clientes',
     icon: <Box size={18} />,
     path: '/clientes',
     section: 'Gestión',
+    roles: ADMIN_MANAGER,
   },
   {
     label: 'Conductores',
     icon: <Truck size={18} />,
     path: '/conductores',
     section: 'Gestión',
+    roles: ADMIN_MANAGER,
   },
   {
     label: 'Mesas',
     icon: <LayoutGrid size={18} />,
     path: '/mesas',
     section: 'Salón',
+    roles: ADMIN_MANAGER,
   },
   {
     label: 'Órdenes',
     icon: <History size={18} />,
     path: '/ordenes',
     section: 'Salón',
+    roles: ALL_ROLES,
   },
   {
     label: 'Categorías',
     icon: <Tag size={18} />,
     path: '/categorias',
     section: 'Catálogo',
+    roles: ADMIN_MANAGER,
   },
   {
     label: 'Productos',
     icon: <Package size={18} />,
     path: '/productos',
     section: 'Catálogo',
+    roles: ADMIN_MANAGER,
   },
   {
     label: 'Registros de Caja',
     icon: <Wallet size={18} />,
     path: '/caja',
     section: 'Finanzas',
+    roles: [Role.ADMIN, Role.MANAGER, Role.CASHIER],
   },
 ];
-
-const sections = navItems.reduce<Record<string, NavItem[]>>((acc, item) => {
-  if (!acc[item.section]) acc[item.section] = [];
-  acc[item.section].push(item);
-  return acc;
-}, {});
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useAuthStore((state) => state.user);
+
+  const visibleNavItems = navItems.filter(
+    (item) => user && item.roles.includes(user.role),
+  );
+
+  const sections = visibleNavItems.reduce<Record<string, NavItem[]>>(
+    (acc, item) => {
+      if (!acc[item.section]) acc[item.section] = [];
+      acc[item.section].push(item);
+      return acc;
+    },
+    {},
+  );
 
   return (
     <aside
@@ -99,8 +137,8 @@ export default function Sidebar() {
       {/* Logo */}
       <button
         type="button"
-        onClick={() => navigate('/dashboard')}
-        title="Ir al dashboard"
+        onClick={() => navigate(getHomePathForRole(user?.role))}
+        title="Ir al inicio"
         className={`relative flex items-center min-h-[72px] border-b border-gray-200 w-full text-left transition-colors hover:bg-gray-50 cursor-pointer ${
           collapsed ? 'justify-center' : 'gap-3 px-5'
         }`}

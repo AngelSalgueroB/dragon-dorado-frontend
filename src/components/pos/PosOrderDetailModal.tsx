@@ -22,45 +22,17 @@ import { Client } from '@stomp/stompjs';
 import { cancelOrder, updateOrder } from '../../actions/orders/update-order';
 import { PaymentMethod } from '../../actions/orders/orders.interface';
 import { toast } from 'react-toastify';
+import useAuthStore from '../../store/auth.store';
+import {
+  canCancelOrders,
+  getAllowedNextOrderStatuses,
+} from '../../auth/role-permissions';
 
 interface PosOrderDetailModalProps {
   order: OrderResponse;
   wsClient: Client | null;
   onClose: () => void;
   onUpdated: () => void;
-}
-
-// Status transitions per type
-function getNextStatuses(
-  currentStatus: OrderStatus,
-  orderType: OrderType,
-): OrderStatus[] {
-  if (currentStatus === OrderStatus.PENDING) {
-    return [OrderStatus.PREPARING];
-  }
-
-  if (currentStatus === OrderStatus.PREPARING) {
-    return [OrderStatus.READY];
-  }
-
-  if (currentStatus === OrderStatus.READY) {
-    return orderType === OrderType.DELIVERY
-      ? [OrderStatus.OUT_FOR_DELIVERY]
-      : [OrderStatus.SERVED];
-  }
-
-  if (currentStatus === OrderStatus.OUT_FOR_DELIVERY) {
-    return [OrderStatus.DELIVERED];
-  }
-
-  if (
-    currentStatus === OrderStatus.DELIVERED ||
-    currentStatus === OrderStatus.SERVED
-  ) {
-    return [OrderStatus.COMPLETED];
-  }
-
-  return [];
 }
 
 const nextStatusLabel: Partial<Record<OrderStatus, string>> = {
@@ -102,9 +74,6 @@ const fmt = (d: string) =>
     minute: '2-digit',
   });
 
-const canCancel = (s: OrderStatus) =>
-  [OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY].includes(s);
-
 export default function PosOrderDetailModal({
   order,
   onClose,
@@ -116,13 +85,14 @@ export default function PosOrderDetailModal({
   const [updatingStatus, setUpdatingStatus] = useState<OrderStatus | null>(
     null,
   );
-  const [loadingPdf, setLoadingPdf] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(order.status);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PaymentMethod.CASH,
   );
   const [paymentDetails, setPaymentDetails] = useState('');
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     (async () => {
@@ -182,7 +152,7 @@ export default function PosOrderDetailModal({
   };
 
   const handlePreCheck = async () => {
-    setLoadingPdf(true);
+    setLoadingTxt(true);
     try {
       const blob = await getOrderPreCheck(order.id);
       const url = URL.createObjectURL(blob);
@@ -192,15 +162,22 @@ export default function PosOrderDetailModal({
       a.click();
       URL.revokeObjectURL(url);
     } finally {
-      setLoadingPdf(false);
+      setLoadingTxt(false);
     }
   };
 
   const cfg = statusConfig[currentStatus];
-  const nextStatuses = getNextStatuses(currentStatus, order.orderType);
+  const nextStatuses = user
+    ? getAllowedNextOrderStatuses(user.role, currentStatus, order.orderType)
+    : [];
   const isFinal = [OrderStatus.COMPLETED, OrderStatus.CANCELLED].includes(
     currentStatus,
   );
+  const canCancelCurrentOrder =
+    canCancelOrders(user?.role) &&
+    [OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY].includes(
+      currentStatus,
+    );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -232,10 +209,10 @@ export default function PosOrderDetailModal({
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handlePreCheck}
-              disabled={loadingPdf}
+              disabled={loadingTxt}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-red-50 hover:text-red-800 hover:border-red-200 transition-all disabled:opacity-50"
             >
-              {loadingPdf ? (
+              {loadingTxt ? (
                 <Loader2 size={13} className="animate-spin" />
               ) : (
                 <FileText size={13} />
@@ -470,10 +447,10 @@ export default function PosOrderDetailModal({
           )}
 
           {/* Status actions */}
-          {!isFinal && (
+          {!isFinal && (canCancelCurrentOrder || nextStatuses.length > 0) && (
             <div className="flex items-center gap-3">
               {/* Cancel button */}
-              {canCancel(currentStatus) && (
+              {canCancelCurrentOrder && (
                 <button
                   onClick={() => setShowCancelConfirm(true)}
                   className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-red-200 text-red-600 text-xs font-black uppercase tracking-wide hover:bg-red-50 transition-all"
@@ -509,6 +486,12 @@ export default function PosOrderDetailModal({
                 })}
               </div>
             </div>
+          )}
+
+          {!isFinal && !canCancelCurrentOrder && nextStatuses.length === 0 && (
+            <p className="text-center text-xs font-bold py-1.5 rounded-xl bg-gray-100 text-gray-500">
+              No hay acciones disponibles para tu rol en este estado
+            </p>
           )}
 
           {isFinal && (

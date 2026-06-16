@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AuthUser } from '../auth/auth.interfaces';
 import { persist } from 'zustand/middleware';
+import { disconnectWebSocket } from '../config/websocket';
 
 interface AuthState {
   user: AuthUser | null;
@@ -19,6 +20,7 @@ const useAuthStore = create<AuthState & AuthActions>()(
       setUser: (user: AuthUser) => set({ user }),
 
       logout: () => {
+        disconnectWebSocket();
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         set({ user: null });
