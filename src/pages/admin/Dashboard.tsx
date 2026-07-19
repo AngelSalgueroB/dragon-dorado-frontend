@@ -17,6 +17,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../../store/auth.store';
 import {
   DashboardDataResponse,
   DashboardOrderStatusResponse,
@@ -337,6 +338,7 @@ function RecentOrdersTable({ orders }: { orders: OrderResponse[] }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
 
   const initialRange = useMemo(() => getTodayRange(), []);
   const [startDate, setStartDate] = useState(initialRange.startDate);
@@ -402,8 +404,7 @@ export default function Dashboard() {
   const avgTicket = totalOrders > 0 ? totalVentas / totalOrders : 0;
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    logout();
     navigate('/login');
   };
 

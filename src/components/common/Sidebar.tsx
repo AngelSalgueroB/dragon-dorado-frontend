@@ -7,6 +7,7 @@ import {
   History,
   LayoutDashboard,
   LayoutGrid,
+  LogOut,
   Package,
   Tag,
   Truck,
@@ -114,6 +115,12 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const visibleNavItems = navItems.filter(
     (item) => user && item.roles.includes(user.role),
@@ -130,7 +137,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`relative flex flex-col min-h-screen bg-white border-r border-gray-200 flex-shrink-0 transition-all duration-300 ease-in-out ${
+      className={`sticky top-0 h-screen flex flex-col bg-white border-r border-gray-200 flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${
         collapsed ? 'w-[72px]' : 'w-60'
       }`}
     >
@@ -139,7 +146,7 @@ export default function Sidebar() {
         type="button"
         onClick={() => navigate(getHomePathForRole(user?.role))}
         title="Ir al inicio"
-        className={`relative flex items-center min-h-[72px] border-b border-gray-200 w-full text-left transition-colors hover:bg-gray-50 cursor-pointer ${
+        className={`relative flex items-center min-h-[72px] flex-shrink-0 border-b border-gray-200 w-full text-left transition-colors hover:bg-gray-50 cursor-pointer ${
           collapsed ? 'justify-center' : 'gap-3 px-5'
         }`}
       >
@@ -164,7 +171,7 @@ export default function Sidebar() {
       </button>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3">
+      <nav className="flex-1 overflow-hidden py-3">
         {Object.entries(sections).map(([section, items]) => (
           <div key={section} className="mb-1">
             {!collapsed ? (
@@ -208,19 +215,38 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Collapse toggle */}
+      {/* Logout + collapse */}
       <div
-        className={`border-t border-gray-200 p-3 flex ${
-          collapsed ? 'justify-center' : 'justify-end'
+        className={`border-t border-gray-200 p-3 flex flex-col gap-2 flex-shrink-0 ${
+          collapsed ? 'items-center' : ''
         }`}
       >
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
-          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200 text-gray-500 hover:bg-red-800 hover:text-white hover:border-red-800 transition-all duration-150 cursor-pointer"
-        >
-          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-        </button>
+        {user?.role !== Role.ADMIN && (
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Cerrar sesión"
+            className={`flex items-center gap-2.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-red-800 hover:text-white hover:border-red-800 transition-all duration-150 cursor-pointer ${
+              collapsed
+                ? 'w-8 h-8 justify-center'
+                : 'w-full px-3 py-2 text-xs font-bold uppercase tracking-wide'
+            }`}
+          >
+            <LogOut size={16} className="flex-shrink-0" />
+            {!collapsed && <span>Cerrar sesión</span>}
+          </button>
+        )}
+
+        <div className={`flex ${collapsed ? 'justify-center' : 'justify-end'}`}>
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200 text-gray-500 hover:bg-red-800 hover:text-white hover:border-red-800 transition-all duration-150 cursor-pointer"
+          >
+            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          </button>
+        </div>
       </div>
     </aside>
   );
