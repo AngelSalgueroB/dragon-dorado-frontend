@@ -6,6 +6,7 @@ import {
   CircleDollarSign,
   Clock3,
   CreditCard,
+  Download,
   Filter,
   PackageCheck,
   RefreshCw,
@@ -34,6 +35,7 @@ import {
   PaymentMethod,
 } from '../../actions/orders/orders.interface';
 import { getDashboardData } from '../../actions/dashboard/get-dashboard-data';
+import { exportDashboardToExcel } from '../../utils/export-dashboard-excel';
 
 const money = (value?: number) => `S/ ${(Number(value) || 0).toFixed(2)}`;
 
@@ -414,6 +416,16 @@ export default function Dashboard() {
     setEndDate(range.endDate);
   };
 
+  const handleExportExcel = () => {
+    if (!dashboardData) return;
+    exportDashboardToExcel(dashboardData, {
+      startDate,
+      endDate,
+      orderType,
+      trendGroupBy,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 text-gray-800 font-sans">
       <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-5 mb-6 border-b border-gray-200 pb-5 relative">
@@ -466,7 +478,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
           <label className="space-y-1">
             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1">
               <CalendarDays size={11} /> Desde
@@ -533,6 +545,16 @@ export default function Dashboard() {
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             {loading ? 'Cargando' : 'Aplicar'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={!dashboardData || loading}
+            className="self-end px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-black uppercase tracking-wide hover:border-emerald-600 hover:text-emerald-700 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
+          >
+            <Download size={14} />
+            Excel
           </button>
         </div>
       </section>
